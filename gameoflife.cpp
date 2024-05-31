@@ -146,8 +146,8 @@ int main(int argc, char * argv[]) {
 	int numRows, numColumns;
 	
 	if (argc == 1) {
-		numRows = 10;
-		numColumns = 10;
+		numRows = 20;
+		numColumns = 20;
 	}
 	else {
 		numRows = atoi(argv[1]);
