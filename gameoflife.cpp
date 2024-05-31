@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <cstdlib>
+#include <windows.h>
+
 
 class gridRow {
 	public:
@@ -20,31 +22,28 @@ class gridRow {
 		}
 
 		void init_row(int length) {
-			int rng = rand() % 250;
 			this->row = std::vector<char>(length, ' ');
-			if (rng < 150) {
-				for (int i=0; i<length; i++) {
-					int rng2 = rand() % 50;
-					if (rng2 > 24) {
-						this->row[i] = '#';
-					}
+			for (int i=0; i<length; i++) {
+				if (rand() % 2 == 0) {
+					this->row[i] = '#';
 				}
 			}
 		}
 
-		void display_row() {
+		void display_row(std::string * outputString) {
 			if (this->length == 0) {
-				std::cout << "ERROR: Row has length 0 or doesn't exist.\n";
+				*outputString += "ERROR: Row has length 0 or doesn't exist.\n";
 			}
 			else {
-				std::cout << "[";
+				*outputString += "[";
 				for (int i=0; i<this->length; i++) {
 					if (i == 0) {
-						std::cout << " ";
+						*outputString += " ";
 					}
-					std::cout << this->row[i] << " ";
+					*outputString += this->row[i];
+					*outputString += " ";
 				}
-				std::cout << "]\n";
+				*outputString += "]\n";
 			}
 		}
 
@@ -74,14 +73,16 @@ class gridCol {
 		}
 
 		void display_grid() {
+			std::string outputString = "";
 			if (this->height == 0) {
-				std::cout << "ERROR: Grid has size 0 or doesn't exist.\n";
+				outputString += "ERROR: Grid has size 0 or doesn't exist.\n";
 			}
 			else {
 				for (int i=0; i<this->height; i++) {
-					this->col[i]->display_row();
+					this->col[i]->display_row(&outputString);
 				}
 			}
+			std::cout << outputString;
 		}
 
 	private:
@@ -153,6 +154,9 @@ int main(int argc, char * argv[]) {
 		numColumns = atoi(argv[2]);
 	}
 
+
+	srand(time(0));
+
 	std::cout << "Creating grid... (" << numRows << "x" << numColumns << ")" << std::endl;
 
 	// Create the grid
@@ -162,11 +166,13 @@ int main(int argc, char * argv[]) {
 	std::cout << "Performing game...\n";
 
 	while(1) {
+		// Clear screen
+		system("cls");
 		// Print screen
 		grid.display_grid();
 		// Update values
 		ConwaysGameOfLife(&grid);
-		system("cls");
+		// Sleep
 	}
 	
 	return 0;
