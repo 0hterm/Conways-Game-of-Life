@@ -20,7 +20,16 @@ class gridRow {
 		}
 
 		void init_row(int length) {
+			int rng = rand() % 250;
 			this->row = std::vector<char>(length, ' ');
+			if (rng < 150) {
+				for (int i=0; i<length; i++) {
+					int rng2 = rand() % 50;
+					if (rng2 > 24) {
+						this->row[i] = '#';
+					}
+				}
+			}
 		}
 
 		void display_row() {
@@ -80,10 +89,30 @@ class gridCol {
 		
 };
 
-void countNeighbors(int row, int column, gridCol * grid) {
+int countNeighbors(int row, int column, gridCol * grid) {
 	//grid->col[row]->row[column];
+	int numNeighbors = 0;
 
-	
+	for (int i=row-1; i<=row+1; i++) {
+		if (i < 0) {i = 0;}
+		int tmpI = i;
+		if (i >= grid->get_height() - 1) {
+			i = grid->get_height() - 2;
+		}
+		for (int j=column-1; j<=column+1; j++) {
+			if (j < 0) {j = 0;}
+			int tmpJ = j;
+			if (j >= grid->col[i]->get_length() - 1) {
+				j = grid->col[i]->get_length() - 2;
+			}
+			if (grid->col[i]->row[j] == '#' && !(i == row && j == column)) {
+				numNeighbors++;
+			}
+			j = tmpJ;
+		}
+		i = tmpI;
+	}
+	return numNeighbors;	
 }
 
 void ConwaysGameOfLife(gridCol * grid) {
@@ -92,7 +121,21 @@ void ConwaysGameOfLife(gridCol * grid) {
 
 	for (int i=0; i<height; i++) {
 		for (int j=0; j<length; j++) {
-			
+			int numNeighbors = countNeighbors(i,j,grid);
+			// Cell is dead and has 3 neighbors, it becomes alive
+			if (grid->col[i]->row[j] != '#' && numNeighbors == 3) {
+				grid->col[i]->row[j] = '#';
+			}
+			// Cell is alive
+			else if (grid->col[i]->row[j] == '#') {
+				// Cell has less than 2 neighbors, it dies
+				if (numNeighbors < 2) {
+					grid->col[i]->row[j] = ' ';
+				}
+				else if (numNeighbors > 3) {
+					grid->col[i]->row[j] = ' ';	
+				}
+			}
 		}
 	}
 
@@ -114,6 +157,7 @@ int main(int argc, char * argv[]) {
 
 	// Create the grid
 	gridCol grid(numRows, numColumns);
+
 	
 	std::cout << "Performing game...\n";
 
@@ -122,6 +166,7 @@ int main(int argc, char * argv[]) {
 		grid.display_grid();
 		// Update values
 		ConwaysGameOfLife(&grid);
+		system("cls");
 	}
 	
 	return 0;
