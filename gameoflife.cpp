@@ -1,7 +1,26 @@
 #include <iostream>
 #include <vector>
 #include <cstdlib>
-#include <windows.h>
+
+#if defined (_WIN32) || defined (_WIN64) 
+	#include <windows.h>
+	void clear_console() {
+		system("cls");
+	}
+	
+	void wait(int ms) {
+		Sleep(ms);
+	}
+#else 
+	#include <unistd.h>
+	void clear_console() {
+		system("clear");
+	}
+
+	void wait(int ms) {
+		usleep(ms * 1000);
+	}
+#endif 
 
 
 class gridRow {
@@ -24,7 +43,7 @@ class gridRow {
 		void init_row(int length) {
 			this->row = std::vector<char>(length, ' ');
 			for (int i=0; i<length; i++) {
-				if (rand() % 2 == 0) {
+				if (rand() % 100 > 92) {
 					this->row[i] = '#';
 				}
 			}
@@ -164,15 +183,20 @@ int main(int argc, char * argv[]) {
 
 	
 	std::cout << "Performing game...\n";
+	int generation = 0;
 
 	while(1) {
+		generation++;
 		// Clear screen
-		system("cls");
+		clear_console();
 		// Print screen
 		grid.display_grid();
 		// Update values
 		ConwaysGameOfLife(&grid);
+		//Print current generation
+		std::cout << "Generation: " << generation << std::endl;
 		// Sleep
+		wait(200);
 	}
 	
 	return 0;
