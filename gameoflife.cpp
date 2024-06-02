@@ -29,7 +29,7 @@ class gridRow {
 
 		gridRow(int num) {
 			this->set_length(num);
-			this->init_row_empty(num);
+			this->init_row_random(num);
 		}
 
 		int get_length() {
@@ -86,7 +86,7 @@ class gridCol {
 			for (int i=0; i<num; i++) {
 				this->col[i] = new gridRow(rowLength);
 			}
-			this->place_random_input(this->col[0]->get_length());
+			//this->place_random_input(this->col[0]->get_length());
 		}
 		
 		// Destructor (frees memory)
@@ -163,9 +163,10 @@ int countNeighbors(int row, int column, gridCol * grid) {
 	return numNeighbors;	
 }
 
-void ConwaysGameOfLife(gridCol * grid) {
+int ConwaysGameOfLife(gridCol * grid) {
 	int height = grid->get_height();
 	int length = grid->col[0]->get_length();
+	int population = 0;
 
 	// Create copy to compare current grid too
 	gridCol * gridCopy = new gridCol(height, length);
@@ -185,6 +186,7 @@ void ConwaysGameOfLife(gridCol * grid) {
 			}
 			// Cell is alive
 			else if (gridCopy->col[i]->row[j] == '#') {
+				population++;
 				// Cell has less than 2 neighbors, it dies
 				if (numNeighbors < 2) {
 					grid->col[i]->row[j] = ' ';
@@ -195,6 +197,7 @@ void ConwaysGameOfLife(gridCol * grid) {
 			}
 		}
 	}
+	return population;
 }
 
 int main(int argc, char * argv[]) {
@@ -220,6 +223,8 @@ int main(int argc, char * argv[]) {
 	
 	std::cout << "Performing game...\n";
 	int generation = 0;
+	int population;
+	int maxPopulation = 0;
 
 	while(1) {
 		generation++;
@@ -228,9 +233,14 @@ int main(int argc, char * argv[]) {
 		// Print screen
 		grid.display_grid();
 		// Update values
-		ConwaysGameOfLife(&grid);
+		population = ConwaysGameOfLife(&grid);
+		if (population > maxPopulation) {
+			maxPopulation = population;
+		}
 		//Print current generation
-		std::cout << "Generation: " << generation << std::endl;
+		std::cout << "Generation: " << generation;
+		std::cout << "\tPopulation: " << population;
+		std::cout << "\tMax Population: " << maxPopulation << std::endl;
 		// Sleep
 		wait(200);
 	}
